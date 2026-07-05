@@ -1,0 +1,8 @@
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^adminpanel/?$ adminpanel/index.php [L,QSA]
+    RewriteRule ^auth/adminpanel/?$ auth/adminpanel/index.php [L,QSA]
+</IfModule>

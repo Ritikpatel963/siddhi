@@ -1,0 +1,5 @@
+/storage/sessions/*
+/storage/resources/*
+/frontend/_route_test.php
+
+!.gitkeep
