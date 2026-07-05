@@ -1,11 +1,24 @@
 <?php
 require_once __DIR__ . '/../../includes/auth_check.php';
-require_once __DIR__ . '/../../config/db.php';
-$studentId = (int) ($_GET['student_id'] ?? 0);
-$sql = 'SELECT qa.*, s.name student_name, s.email student_email, q.title quiz_title, sub.name subject_name, c.name course_name FROM quiz_attempts qa JOIN students s ON s.id = qa.student_id JOIN quizzes q ON q.id = qa.quiz_id JOIN subjects sub ON sub.id = q.subject_id JOIN courses c ON c.id = sub.course_id';
-if ($studentId) { $sql .= ' WHERE qa.student_id = ' . $studentId; }
-$results = $pdo->query($sql . ' ORDER BY qa.attempted_at DESC')->fetchAll();
-$pageTitle = 'Quiz Results'; $active = 'quiz-results'; include __DIR__ . '/../../includes/header.php';
+require_once __DIR__ . '/../quizzes/data.php';
+$pageTitle = 'Quiz Result / Attempts';
+$active = 'quiz-results';
+include __DIR__ . '/../../includes/header.php';
 ?>
-<div class="panel"><h2 class="h5 mb-3">Student Attempts</h2><div class="table-responsive"><table class="table table-hover align-middle data-table"><thead><tr><th>Student</th><th>Course / Subject</th><th>Quiz</th><th>Score</th><th>Status</th><th>Attempted</th></tr></thead><tbody><?php foreach ($results as $result): ?><tr><td><strong><?= e($result['student_name']) ?></strong><div class="small text-secondary"><?= e($result['student_email']) ?></div></td><td><?= e($result['course_name']) ?><div class="small text-secondary"><?= e($result['subject_name']) ?></div></td><td><?= e($result['quiz_title']) ?></td><td><?= e($result['score']) ?>/<?= e($result['total_marks']) ?></td><td><?= status_badge($result['status']) ?></td><td><?= e(format_date($result['attempted_at'])) ?></td></tr><?php endforeach; ?><?php if (!$results): ?><tr><td colspan="6" class="text-center text-secondary">No quiz attempts yet.</td></tr><?php endif; ?></tbody></table></div></div>
+<div class="quiz-page">
+    <div class="quiz-toolbar"><div><h2>Quiz Result / Attempts</h2><p>Admin overview of quiz performance.</p></div></div>
+    <div class="result-cards mb-3">
+        <?php foreach ([['Total Assigned Students', 184], ['Attempted', 126], ['Not Attempted', 58], ['Passed', 104], ['Failed', 22], ['Average Score', '68%']] as $card): ?>
+            <div class="stat-card"><div class="value"><?= e($card[1]) ?></div><div class="label"><?= e($card[0]) ?></div></div>
+        <?php endforeach; ?>
+    </div>
+    <div class="panel">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle data-table">
+                <thead><tr><th>Student Name</th><th>Course</th><th>Quiz Title</th><th>Score</th><th>Percentage</th><th>Result Status</th><th>Time Taken</th><th>Attempt Date</th><th>Actions</th></tr></thead>
+                <tbody><?php foreach ($attempts as $attempt): ?><tr><td><strong><?= e($attempt['student']) ?></strong></td><td><?= e($attempt['course']) ?></td><td><?= e($attempt['quiz']) ?></td><td><?= e($attempt['score']) ?></td><td><?= e($attempt['percent']) ?></td><td><?= quiz_badge($attempt['status']) ?></td><td><?= e($attempt['time']) ?></td><td><?= e($attempt['date']) ?></td><td class="table-actions"><a class="btn btn-sm btn-primary" href="<?= e(url('modules/quiz-results/attempt-review.php')) ?>">View Attempt</a><button class="btn btn-sm btn-outline-secondary" type="button">Download Result</button><button class="btn btn-sm btn-outline-danger" type="button">Reset Attempt</button></td></tr><?php endforeach; ?></tbody>
+            </table>
+        </div>
+    </div>
+</div>
 <?php include __DIR__ . '/../../includes/footer.php'; ?>

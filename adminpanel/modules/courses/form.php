@@ -113,9 +113,9 @@
                 <div class="mb-3">
                     <label class="form-label">Status</label>
                     <select class="form-select" name="status">
-                        <option value="active" <?= $course['status'] === 'active' ? 'selected' : '' ?>>🟢 Active (Published)</option>
-                        <option value="inactive" <?= $course['status'] === 'inactive' ? 'selected' : '' ?>>⚪ Inactive (Draft)</option>
-                        <option value="draft" <?= $course['status'] === 'draft' ? 'selected' : '' ?>>📝 Draft</option>
+                        <option value="active" <?= $course['status'] === 'active' ? 'selected' : '' ?>Active (Published)</option>
+                        <option value="inactive" <?= $course['status'] === 'inactive' ? 'selected' : '' ?>Inactive (Draft)</option>
+                        <option value="draft" <?= $course['status'] === 'draft' ? 'selected' : '' ?>Draft</option>
                     </select>
                 </div>
 
