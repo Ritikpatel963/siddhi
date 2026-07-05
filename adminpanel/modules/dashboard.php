@@ -81,7 +81,7 @@ include __DIR__ . '/../includes/header.php';
         <div class="panel">
             <h2 class="h5 mb-3">Recent Quiz Results</h2>
             <div class="table-responsive">
-                <table class="table align-middle">
+                <table class="table table-hover align-middle data-table">
                     <thead><tr><th>Student</th><th>Quiz</th><th>Score</th><th>Status</th><th>Attempted</th></tr></thead>
                     <tbody>
                     <?php foreach ($recent as $row): ?>
@@ -102,7 +102,7 @@ include __DIR__ . '/../includes/header.php';
     <div class="col-12">
         <div class="panel">
             <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 mb-0">Recent Students</h2><a class="btn btn-sm btn-outline-primary" href="<?= e(url('modules/students/list.php')) ?>">View all students</a></div>
-            <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Student</th><th>Assigned Courses</th><th>Status</th><th>Joined</th></tr></thead><tbody><?php foreach ($recentStudents as $student): ?><tr><td><strong><?= e($student['name']) ?></strong><div class="small text-secondary"><?= e($student['email']) ?></div></td><td><?= e($student['course_names'] ?: 'Not enrolled') ?></td><td><?= status_badge($student['status']) ?></td><td><?= e(format_date($student['created_at'])) ?></td></tr><?php endforeach; ?><?php if (!$recentStudents): ?><tr><td colspan="4" class="text-center text-secondary">No students yet.</td></tr><?php endif; ?></tbody></table></div>
+            <div class="table-responsive"><table class="table table-hover align-middle data-table"><thead><tr><th>Student</th><th>Assigned Courses</th><th>Status</th><th>Joined</th></tr></thead><tbody><?php foreach ($recentStudents as $student): ?><tr><td><strong><?= e($student['name']) ?></strong><div class="small text-secondary"><?= e($student['email']) ?></div></td><td><?= e($student['course_names'] ?: 'Not enrolled') ?></td><td><?= status_badge($student['status']) ?></td><td><?= e(format_date($student['created_at'])) ?></td></tr><?php endforeach; ?><?php if (!$recentStudents): ?><tr><td colspan="4" class="text-center text-secondary">No students yet.</td></tr><?php endif; ?></tbody></table></div>
         </div>
     </div>
 </div>

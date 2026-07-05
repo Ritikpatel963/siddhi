@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dashboard – MyExamPrep</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --teal:#0d7a6e;--teal-dark:#095f55;--teal-light:#e6f5f3;--teal-mid:#c3e8e2;
+  --navy:#0e1f4d;--gold:#f5a623;--gold-light:#fef9ec;
+  --red:#dc2626;--red-light:#fef2f2;
+  --purple:#7c3aed;--purple-light:#ede9fe;
+  --blue:#0284c7;--blue-light:#e0f2fe;
+  --green:#16a34a;--green-light:#dcfce7;
+  --orange:#ea580c;--orange-light:#fff7ed;
+  --white:#fff;--grey-bg:#f4f6f9;--grey-100:#f1f4f8;
+  --grey-text:#6b7280;--border:#e2e8f0;--radius:12px;
+  --sw:220px;
+}
+html,body{height:100%;}
+body{font-family:'Inter',sans-serif;color:var(--navy);background:var(--grey-bg);display:flex;flex-direction:column;overflow:hidden;}
+
+/* ── TOPBAR ── */
+.tb{height:62px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:14px;flex-shrink:0;z-index:200;}
+.tb-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0;}
+.tb-logo-icon{width:38px;height:38px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.tb-logo-icon svg{width:22px;height:22px;fill:white;}
+.tb-brand{font-family:'Manrope',sans-serif;font-size:1.1rem;font-weight:800;color:var(--navy);}
+.tb-brand span{color:var(--teal);}
+.tb-tagline{font-size:.6rem;color:var(--grey-text);}
+.tb-ham{width:36px;height:36px;border:none;background:none;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.tb-ham:hover{background:var(--grey-100);}
+.tb-ham svg{width:20px;height:20px;stroke:var(--navy);fill:none;stroke-width:2;}
+.tb-search{flex:1;max-width:400px;margin:0 auto;display:flex;align-items:center;gap:10px;background:var(--grey-100);border:1px solid var(--border);border-radius:50px;padding:8px 16px;}
+.tb-search svg{width:15px;height:15px;stroke:var(--grey-text);fill:none;stroke-width:2;flex-shrink:0;}
+.tb-search input{border:none;background:none;outline:none;font-size:.84rem;color:var(--navy);width:100%;font-family:'Inter',sans-serif;}
+.tb-search input::placeholder{color:#9ca3af;}
+.tb-right{display:flex;align-items:center;gap:10px;margin-left:auto;}
+.ib{position:relative;width:36px;height:36px;border:none;background:none;cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.ib:hover{background:var(--grey-100);}
+.ib svg{width:20px;height:20px;stroke:var(--navy);fill:none;stroke-width:2;}
+.nbadge{position:absolute;top:2px;right:2px;width:16px;height:16px;background:var(--red);border-radius:50%;font-size:.6rem;font-weight:700;color:white;display:flex;align-items:center;justify-content:center;border:2px solid white;}
+.upill{display:flex;align-items:center;gap:8px;cursor:pointer;padding:5px 10px;border-radius:8px;border:none;background:none;font-family:'Inter',sans-serif;transition:background .15s;}
+.upill:hover{background:var(--grey-100);}
+.uav{width:34px;height:34px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:white;flex-shrink:0;}
+.uname{font-size:.84rem;font-weight:700;color:var(--navy);display:block;}
+.uplan{font-size:.68rem;color:var(--grey-text);display:block;}
+.upill svg{width:13px;height:13px;stroke:var(--grey-text);fill:none;stroke-width:2;}
+
+/* ── LAYOUT ── */
+.wrap{display:flex;flex:1;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sb{width:var(--sw);flex-shrink:0;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;transition:width .25s ease;}
+.sb.closed{width:0;overflow:hidden;}
+.nav-sec{padding:8px 10px 2px;}
+.nav-sec-lbl{font-size:.62rem;font-weight:700;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase;padding:8px 10px 3px;}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;text-decoration:none;font-size:.83rem;font-weight:500;color:var(--grey-text);transition:all .15s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif;}
+.ni:hover{background:var(--grey-100);color:var(--navy);}
+.ni.act{background:var(--teal);color:white;font-weight:600;}
+.ni.act svg{stroke:white;}
+.ni svg{width:17px;height:17px;stroke:var(--grey-text);fill:none;stroke-width:2;flex-shrink:0;}
+.ni:hover svg{stroke:var(--navy);}
+.nbdg{font-size:.63rem;font-weight:700;padding:2px 7px;border-radius:50px;margin-left:auto;flex-shrink:0;}
+.nbdg.new{background:var(--teal-light);color:var(--teal);}
+.nbdg.cnt{background:var(--red);color:white;}
+.sdiv{height:1px;background:var(--border);margin:6px 12px;}
+.ref-card{margin:10px 10px 14px;padding:16px;background:var(--teal-light);border-radius:var(--radius);text-align:center;}
+.ref-card .ri{width:30px;height:30px;margin:0 auto 8px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.ref-card .ri svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2;}
+.ref-card h4{font-size:.8rem;font-weight:700;color:var(--navy);margin-bottom:2px;}
+.ref-card p{font-size:.7rem;color:var(--grey-text);margin-bottom:10px;line-height:1.4;}
+.btn-ref{width:100%;padding:8px;background:var(--teal);color:white;border:none;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:background .2s;}
+.btn-ref:hover{background:var(--teal-dark);}
+.btn-ref svg{width:13px;height:13px;stroke:white;fill:none;stroke-width:2.5;}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;min-width:0;padding-bottom:20px;}
+
+/* ── WELCOME + PLAN ── */
+.wbar{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 12px;gap:14px;flex-wrap:wrap;}
+.wbar h2{font-family:'Manrope',sans-serif;font-size:1.3rem;font-weight:900;color:var(--navy);}
+.wbar p{font-size:.83rem;color:var(--grey-text);margin-top:2px;}
+.plan-pill{display:flex;align-items:center;gap:14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;flex-shrink:0;}
+.plan-icon{width:36px;height:36px;background:var(--teal-light);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.plan-icon svg{width:18px;height:18px;stroke:var(--teal);fill:none;stroke-width:2;}
+.plan-lbl{font-size:.66rem;color:var(--grey-text);}
+.plan-name{font-family:'Manrope',sans-serif;font-size:.9rem;font-weight:800;color:var(--navy);}
+.plan-valid{font-size:.68rem;color:var(--grey-text);margin-top:1px;}
+.btn-vplan{padding:8px 16px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:.78rem;font-weight:600;color:var(--navy);background:white;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.btn-vplan:hover{border-color:var(--teal);color:var(--teal);}
+
+/* ── STAT CARDS ── */
+.sc-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:0 22px 16px;}
+.sc{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.sc-lbl{font-size:.73rem;color:var(--grey-text);font-weight:500;margin-bottom:8px;}
+.sc-val{font-family:'Manrope',sans-serif;font-size:1.75rem;font-weight:900;color:var(--navy);line-height:1;}
+.sc-sub{font-size:.7rem;color:var(--grey-text);margin-top:4px;}
+.sc-sub.good{color:var(--green);}
+.sc-ico{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sc-ico svg{width:23px;height:23px;fill:none;stroke-width:2;}
+.sc-ico.t{background:var(--teal-light);} .sc-ico.t svg{stroke:var(--teal);}
+.sc-ico.p{background:var(--purple-light);} .sc-ico.p svg{stroke:var(--purple);}
+.sc-ico.g{background:var(--gold-light);} .sc-ico.g svg{stroke:var(--gold);}
+.sc-ico.r{background:var(--red-light);} .sc-ico.r svg{stroke:var(--red);}
+.pbar{height:5px;background:var(--grey-100);border-radius:50px;margin-top:10px;overflow:hidden;}
+.pbar-f{height:100%;border-radius:50px;}
+.spark{height:34px;width:100%;margin-top:6px;}
+
+/* ── SECTION HEADER ── */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sh h3{font-family:'Manrope',sans-serif;font-size:.94rem;font-weight:800;color:var(--navy);}
+.sh a,.sh button.link{font-size:.76rem;font-weight:600;color:var(--teal);text-decoration:none;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:3px;}
+.wsel{padding:5px 10px;border:1px solid var(--border);border-radius:6px;font-size:.73rem;font-family:'Inter',sans-serif;background:white;cursor:pointer;color:var(--navy);}
+
+/* ── CARD ── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
+
+/* ── 3-COL GRID ── */
+.g3{display:grid;grid-template-columns:1fr 280px 280px;gap:16px;padding:0 22px 16px;}
+/* 2-col variant */
+.g2{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;padding:0 22px 16px;}
+/* full width */
+.fw{padding:0 22px 16px;}
+
+/* ── STUDY OVERVIEW / DONUT ── */
+.sov{display:grid;grid-template-columns:160px 1fr;gap:20px;align-items:center;}
+.dnut-wrap{position:relative;width:150px;height:150px;}
+.dnut-lbl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;}
+.dnut-lbl .dv{font-family:'Manrope',sans-serif;font-size:1rem;font-weight:900;color:var(--navy);}
+.dnut-lbl .ds{font-size:.6rem;color:var(--grey-text);}
+.leg-list{display:flex;flex-direction:column;gap:7px;}
+.leg{display:flex;align-items:center;gap:8px;}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.leg-name{font-size:.78rem;color:var(--navy);flex:1;}
+.leg-pct{font-size:.72rem;color:var(--grey-text);}
+
+/* ── DAILY GOAL ── */
+.goal-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.goal-ico{width:44px;height:44px;background:var(--teal-light);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.goal-ico svg{width:22px;height:22px;stroke:var(--teal);fill:none;stroke-width:2;}
+.goal-txt{flex:1;min-width:0;}
+.goal-txt h4{font-size:.86rem;font-weight:700;color:var(--navy);margin-bottom:2px;}
+.goal-txt p{font-size:.73rem;color:var(--grey-text);}
+.ring-w{position:relative;width:54px;height:54px;flex-shrink:0;}
+.ring-lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--teal);}
+.tasks-info{text-align:center;flex-shrink:0;}
+.tasks-num{font-size:.84rem;font-weight:700;color:var(--navy);}
+.tasks-pbar{width:110px;height:5px;background:var(--grey-100);border-radius:50px;overflow:hidden;margin-top:5px;}
+.tasks-pbar-f{height:100%;background:var(--teal);border-radius:50px;}
+.btn-goals{padding:8px 16px;border:1.5px solid var(--border);border-radius:8px;font-size:.76rem;font-weight:600;cursor:pointer;background:white;transition:all .2s;white-space:nowrap;flex-shrink:0;}
+.btn-goals:hover{border-color:var(--teal);color:var(--teal);}
+
+/* ── PERFORMANCE TABLE ── */
+.ptbl{width:100%;border-collapse:collapse;}
+.ptbl th{font-size:.7rem;font-weight:600;color:var(--grey-text);text-align:left;padding:6px 10px;border-bottom:1px solid var(--border);}
+.ptbl td{font-size:.8rem;color:var(--navy);padding:10px;border-bottom:1px solid var(--border);}
+.ptbl tr:last-child td{border-bottom:none;}
+.ptbl tr:hover td{background:var(--grey-bg);}
+.pbdg{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.68rem;font-weight:700;}
+.pbdg.good{background:var(--green-light);color:var(--green);}
+.pbdg.avg{background:var(--orange-light);color:var(--orange);}
+
+/* ── BAR CHART SECTION ── */
+.bar-chart-wrap{height:200px;position:relative;width:100%;}
+
+/* ── QUICK ACCESS ── */
+.qa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.qa-btn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 8px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .2s;text-decoration:none;background:white;}
+.qa-btn:hover{border-color:var(--teal);box-shadow:0 4px 12px rgba(13,122,110,.1);transform:translateY(-2px);}
+.qa-ic{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.qa-ic svg{width:22px;height:22px;fill:none;stroke-width:2;}
+.qa-btn span{font-size:.72rem;font-weight:600;color:var(--navy);text-align:center;}
+
+/* ── UPCOMING TASKS ── */
+.task-list{display:flex;flex-direction:column;gap:6px;}
+.task{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;transition:background .15s;cursor:pointer;}
+.task:hover{background:var(--grey-bg);}
+.tic{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tic svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2;}
+.tic.q{background:var(--teal);}
+.tic.m{background:var(--purple);}
+.tic.s{background:var(--blue);}
+.tic.r{background:var(--gold);}
+.tname{font-size:.79rem;font-weight:600;color:var(--navy);flex:1;}
+.tdue{font-size:.68rem;font-weight:600;display:flex;align-items:center;gap:3px;white-space:nowrap;}
+.tdue svg{width:11px;height:11px;fill:none;stroke-width:2;}
+.tdue.urg{color:var(--red);}
+.tdue.soon{color:var(--gold);}
+.tdue.norm{color:var(--blue);}
+.tarr{width:15px;height:15px;stroke:var(--grey-text);fill:none;stroke-width:2;flex-shrink:0;}
+
+/* ── NEXT MOCK TEST ── */
+.mock-card{display:flex;flex-direction:column;gap:12px;}
+.mock-row{display:flex;align-items:flex-start;gap:12px;}
+.mock-ic{width:40px;height:40px;background:var(--teal-light);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mock-ic svg{width:20px;height:20px;stroke:var(--teal);fill:none;stroke-width:2;}
+.mock-t{font-family:'Manrope',sans-serif;font-size:.9rem;font-weight:800;color:var(--navy);margin-bottom:3px;}
+.mock-m{font-size:.71rem;color:var(--grey-text);}
+.mock-d{display:flex;align-items:center;gap:5px;font-size:.71rem;color:var(--grey-text);margin-top:4px;}
+.mock-d svg{width:12px;height:12px;stroke:var(--grey-text);fill:none;stroke-width:2;}
+.btn-mock{width:100%;padding:12px;background:var(--teal);color:white;border:none;border-radius:10px;font-size:.86rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s;}
+.btn-mock:hover{background:var(--teal-dark);}
+.btn-mock svg{width:15px;height:15px;stroke:white;fill:none;stroke-width:2.5;}
+
+/* ── WEAK AREAS ── */
+.weak-list{display:flex;flex-direction:column;gap:11px;}
+.wi{display:flex;align-items:center;gap:8px;}
+.wi-name{font-size:.77rem;color:var(--navy);width:108px;flex-shrink:0;}
+.wbdg{font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:50px;flex-shrink:0;white-space:nowrap;}
+.wbdg.ni_{background:var(--red-light);color:var(--red);}
+.wbdg.im{background:var(--orange-light);color:var(--orange);}
+.wbdg.av{background:var(--gold-light);color:var(--gold);}
+.wbdg.gd{background:var(--green-light);color:var(--green);}
+.wbar-w{flex:1;height:6px;background:var(--grey-100);border-radius:50px;overflow:hidden;}
+.wbar-f{height:100%;border-radius:50px;}
+.wpct{font-size:.74rem;font-weight:700;color:var(--navy);width:30px;text-align:right;flex-shrink:0;}
+
+/* ── LEADERBOARD ── */
+.lb-list{display:flex;flex-direction:column;gap:5px;}
+.li{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;transition:background .15s;}
+.li:hover{background:var(--grey-bg);}
+.li.you{background:var(--teal-light);}
+.lrank{width:20px;text-align:center;font-size:.8rem;font-weight:700;color:var(--grey-text);flex-shrink:0;}
+.lav{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.64rem;font-weight:700;flex-shrink:0;}
+.lname{font-size:.79rem;font-weight:600;color:var(--navy);flex:1;}
+.lxp{font-size:.74rem;font-weight:700;color:var(--teal);}
+.btn-flb{width:100%;padding:9px;border:1.5px solid var(--border);border-radius:10px;font-size:.78rem;font-weight:600;cursor:pointer;background:white;transition:all .2s;margin-top:6px;}
+.btn-flb:hover{border-color:var(--teal);color:var(--teal);}
+
+/* ── PROGRESS TRACKER (new full section) ── */
+.progress-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
+.prog-card{background:var(--grey-bg);border-radius:10px;padding:14px;border:1px solid var(--border);}
+.prog-card h4{font-size:.76rem;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.prog-card .pc-val{font-family:'Manrope',sans-serif;font-size:1.4rem;font-weight:900;margin-bottom:6px;}
+.prog-bar-row{display:flex;align-items:center;gap:8px;}
+.prog-bar-row span{font-size:.68rem;color:var(--grey-text);}
+
+/* ── FLASHCARDS SECTION ── */
+.fc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.fc-card{border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;background:white;}
+.fc-card:hover{border-color:var(--teal);transform:translateY(-2px);box-shadow:0 6px 16px rgba(13,122,110,.1);}
+.fc-icon{width:40px;height:40px;border-radius:10px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;}
+.fc-icon svg{width:20px;height:20px;fill:none;stroke-width:2;}
+.fc-card h4{font-size:.8rem;font-weight:700;color:var(--navy);margin-bottom:2px;}
+.fc-card p{font-size:.68rem;color:var(--grey-text);}
+.fc-count{font-family:'Manrope',sans-serif;font-size:1.1rem;font-weight:900;color:var(--teal);margin-top:4px;}
+
+/* ── STUDY STREAK CALENDAR ── */
+.streak-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.sday{height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:600;color:var(--grey-text);}
+.sday.done{background:var(--teal);color:white;}
+.sday.partial{background:var(--teal-light);color:var(--teal);}
+.sday.today{background:var(--teal);color:white;box-shadow:0 0 0 2px white,0 0 0 4px var(--teal);}
+.sday.off{background:var(--grey-100);color:#d1d5db;}
+.streak-labels{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;}
+.streak-labels span{font-size:.6rem;text-align:center;color:var(--grey-text);font-weight:600;}
+
+/* ── NOTES SECTION ── */
+.notes-list{display:flex;flex-direction:column;gap:8px;}
+.note-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;transition:background .15s;cursor:pointer;}
+.note-item:hover{background:var(--grey-bg);}
+.note-ico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.note-ico svg{width:17px;height:17px;fill:none;stroke-width:2;}
+.note-title{font-size:.81rem;font-weight:600;color:var(--navy);margin-bottom:2px;}
+.note-meta{font-size:.68rem;color:var(--grey-text);}
+.note-tag{font-size:.64rem;font-weight:700;padding:2px 8px;border-radius:50px;margin-left:auto;flex-shrink:0;}
+
+/* ── MESSAGES SECTION ── */
+.msg-list{display:flex;flex-direction:column;gap:6px;}
+.msg-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;transition:background .15s;cursor:pointer;}
+.msg-item:hover{background:var(--grey-bg);}
+.msg-item.unread{border-left:3px solid var(--teal);}
+.mav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;}
+.mname{font-size:.8rem;font-weight:700;color:var(--navy);margin-bottom:2px;}
+.mtxt{font-size:.73rem;color:var(--grey-text);}
+.mtime{font-size:.65rem;color:var(--grey-text);margin-left:auto;flex-shrink:0;white-space:nowrap;}
+.munread{width:8px;height:8px;background:var(--teal);border-radius:50%;margin-top:4px;flex-shrink:0;}
+
+/* ── PRO TIP BAR ── */
+.ptip{background:var(--white);border-top:1px solid var(--border);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.ptip-l{display:flex;align-items:center;gap:8px;font-size:.79rem;color:var(--navy);}
+.ptip-l svg{width:17px;height:17px;stroke:var(--gold);fill:none;stroke-width:2;flex-shrink:0;}
+.ptip-r{font-size:.76rem;font-weight:600;color:var(--teal);cursor:pointer;text-decoration:none;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1200px){
+  .g3{grid-template-columns:1fr 260px 260px;}
+  .sc-row{grid-template-columns:repeat(2,1fr);}
+  .progress-grid{grid-template-columns:repeat(2,1fr);}
+  .qa-grid[style*="repeat(8"]{grid-template-columns:repeat(4,1fr)!important;}
+}
+@media(max-width:1000px){
+  .g3{grid-template-columns:1fr 1fr;}
+  .g2{grid-template-columns:1fr;}
+  .fc-grid{grid-template-columns:repeat(2,1fr);}
+  .qa-grid{grid-template-columns:repeat(4,1fr);}
+  .qa-grid[style*="repeat(8"]{grid-template-columns:repeat(4,1fr)!important;}
+}
+@media(max-width:900px){
+  html,body{overflow:auto;}
+  .wrap{flex-direction:column;overflow:visible;}
+  .sb{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:0;overflow:hidden;transition:max-height .35s ease;}
+  .sb.mob-open{max-height:700px;}
+  .main{overflow:visible;}
+  .tb-search{display:none;}
+}
+@media(max-width:600px){
+  .sc-row{grid-template-columns:1fr 1fr;}
+  .fc-grid{grid-template-columns:repeat(2,1fr);}
+  .qa-grid{grid-template-columns:repeat(4,1fr);}
+  .plan-pill{display:none;}
+  .sov{grid-template-columns:1fr;}
+  .progress-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ TOP BAR ══ -->
+<div class="tb">
+  <button class="tb-ham" onclick="toggleSB()">
+    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <a class="tb-logo" href="#">
+    <div class="tb-logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <div><div class="tb-brand">My<span>Exam</span>Prep</div><div class="tb-tagline">— Preparing You for Global Success —</div></div>
+  </a>
+  <div class="tb-search">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input placeholder="Search resources, notes, mocks…"/>
+  </div>
+  <div class="tb-right">
+    <button class="ib"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="nbadge">3</span></button>
+    <button class="ib"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></button>
+    <button class="upill">
+      <div class="uav">SR</div>
+      <div><span class="uname">Student</span><span class="uplan">Premium Plan</span></div>
+      <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ══ SIDEBAR ══ -->
+<div class="sb" id="sb">
+  <div class="nav-sec">
+    <button class="ni act"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</button>
+    <button class="ni"><svg viewBox="0 0 24 24"><path d="M22 10V6a2 2 0 00-2-2H4a2 2 0 00-2 2v4"/><path d="M2 10h20v10a2 2 0 01-2 2H4a2 2 0 01-2-2V10z"/></svg>My Courses</button>
+    <button class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Study Plan</button>
+    <button class="ni"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Daily Quiz<span class="nbdg new">New</span></button>
+    <button class="ni"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Mock Tests</button>
+    <button class="ni"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Notes &amp; Resources</button>
+    <button class="ni"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>Flashcards</button>
+  </div>
+  <div class="sdiv"></div>
+  <div class="nav-sec">
+    <div class="nav-sec-lbl">Analytics</div>
+    <button class="ni"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Progress Tracker</button>
+    <button class="ni"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Performance</button>
+    <button class="ni"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4z"/><path d="M5 4H3v2a4 4 0 004 4M19 4h2v2a4 4 0 01-4 4"/></svg>Leaderboard</button>
+  </div>
+  <div class="sdiv"></div>
+  <div class="nav-sec">
+    <div class="nav-sec-lbl">Library</div>
+    <button class="ni"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>Bookmarks</button>
+    <button class="ni"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Downloads</button>
+    <button class="ni"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Community</button>
+    <button class="ni"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Messages<span class="nbdg cnt">2</span></button>
+    <button class="ni"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M20 12h2M2 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>Settings</button>
+  </div>
+  <div class="sdiv"></div>
+  <div class="ref-card">
+    <div class="ri"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
+    <h4>Refer &amp; Earn</h4>
+    <p>Invite your friends and Earn exciting rewards!</p>
+    <button class="btn-ref">Refer Now <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- Welcome + Plan -->
+  <div class="wbar">
+    <div><h2>Welcome back, Student! 👋</h2><p>Let's continue your APC success journey.</p></div>
+    <div class="plan-pill">
+      <div class="plan-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+      <div><div class="plan-lbl">Your Plan</div><div class="plan-name">Premium Plan</div><div class="plan-valid">Valid till 24 May 2025</div></div>
+      <button class="btn-vplan">View Plan</button>
+    </div>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="sc-row">
+    <div class="sc">
+      <div><div class="sc-lbl">Overall Progress</div><div class="sc-val">63%</div><div class="sc-sub">You're doing great!</div><div class="pbar"><div class="pbar-f" style="width:63%;background:var(--teal)"></div></div></div>
+      <div class="sc-ico t"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+    </div>
+    <div class="sc">
+      <div><div class="sc-lbl">Mocks Attempted</div><div class="sc-val">12 <span style="font-size:.95rem;font-weight:500;color:var(--grey-text)">of 25</span></div><div class="sc-sub">48% Completed</div><div class="pbar"><div class="pbar-f" style="width:48%;background:var(--purple)"></div></div></div>
+      <div class="sc-ico p"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+    </div>
+    <div class="sc">
+      <div><div class="sc-lbl">Average Score</div><div class="sc-val">67%</div><div class="sc-sub good">▲ +8% from last week</div><canvas id="sparkline" class="spark"></canvas></div>
+      <div class="sc-ico g"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+    </div>
+    <div class="sc">
+      <div><div class="sc-lbl">Study Streak</div><div class="sc-val">7</div><div class="sc-sub">Days in a row 🔥</div></div>
+      <div class="sc-ico r"><svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/></svg></div>
+    </div>
+  </div>
+
+  <!-- ROW: Study Overview | Upcoming Tasks | Next Mock -->
+  <div class="g3">
+
+    <!-- Study Overview -->
+    <div class="card">
+      <div class="sh"><h3>Your Study Overview</h3><select class="wsel"><option>This Week</option><option>Last Week</option><option>This Month</option></select></div>
+      <div class="sov">
+        <div class="dnut-wrap"><canvas id="donut"></canvas><div class="dnut-lbl"><div class="dv">19h 45m</div><div class="ds">Total Study Time</div></div></div>
+        <div class="leg-list">
+          <div class="leg"><div class="leg-dot" style="background:#0d7a6e"></div><span class="leg-name">Musculoskeletal</span><span class="leg-pct">6h 30m (33%)</span></div>
+          <div class="leg"><div class="leg-dot" style="background:#7c3aed"></div><span class="leg-name">Neurology</span><span class="leg-pct">4h 15m (22%)</span></div>
+          <div class="leg"><div class="leg-dot" style="background:#f5a623"></div><span class="leg-name">Cardiorespiratory</span><span class="leg-pct">3h 30m (18%)</span></div>
+          <div class="leg"><div class="leg-dot" style="background:#0284c7"></div><span class="leg-name">Professional Practice</span><span class="leg-pct">3h 00m (15%)</span></div>
+          <div class="leg"><div class="leg-dot" style="background:#d1d5db"></div><span class="leg-name">Others</span><span class="leg-pct">2h 30m (12%)</span></div>
+        </div>
+      </div>
+      <!-- Daily Goal inside -->
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+        <div class="goal-row">
+          <div class="goal-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+          <div class="goal-txt"><h4>Daily Goal</h4><p>Great start! Keep going to hit your daily goal.</p></div>
+          <div class="ring-w"><canvas id="ring" width="54" height="54"></canvas><div class="ring-lbl">75%</div></div>
+          <div class="tasks-info"><div class="tasks-num">3/4 Tasks</div><div class="tasks-pbar"><div class="tasks-pbar-f" style="width:75%"></div></div></div>
+          <button class="btn-goals">View All Goals</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Tasks -->
+    <div class="card">
+      <div class="sh"><h3>Upcoming Tasks</h3></div>
+      <div class="task-list">
+        <div class="task"><div class="tic q"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><span class="tname">Daily Quiz</span><span class="tdue urg"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Due in 3h 45m</span><svg class="tarr" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="task"><div class="tic m"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div><span class="tname">Mock Test 13</span><span class="tdue soon">Due Tomorrow</span><svg class="tarr" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="task"><div class="tic s"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><span class="tname">Study: Neurology</span><span class="tdue norm">Due in 2 Days</span><svg class="tarr" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="task"><div class="tic r"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><span class="tname">Review 10 Notes</span><span class="tdue norm">Due in 3 Days</span><svg class="tarr" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="task"><div class="tic q" style="background:var(--green)"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div><span class="tname">Flashcard Revision</span><span class="tdue norm">Due in 4 Days</span><svg class="tarr" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+    </div>
+
+    <!-- Next Mock + Weak + LB -->
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="card">
+        <div class="sh"><h3>Next Mock Test</h3><a href="#">View All</a></div>
+        <div class="mock-card">
+          <div class="mock-row">
+            <div class="mock-ic"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+            <div><div class="mock-t">Full Length Mock Test 13</div><div class="mock-m">120 Questions &nbsp;•&nbsp; 2:30 Hours</div><div class="mock-d"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>24 May 2024, 10:00 AM</div></div>
+          </div>
+          <button class="btn-mock">Start Mock Test <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sh"><h3>Weak Areas</h3><a href="#">View Details</a></div>
+        <div class="weak-list">
+          <div class="wi"><span class="wi-name">Neurology</span><span class="wbdg ni_">Needs Improvement</span><div class="wbar-w"><div class="wbar-f" style="width:52%;background:var(--red)"></div></div><span class="wpct">52%</span></div>
+          <div class="wi"><span class="wi-name">Cardiorespiratory</span><span class="wbdg im">Improve More</span><div class="wbar-w"><div class="wbar-f" style="width:61%;background:var(--orange)"></div></div><span class="wpct">61%</span></div>
+          <div class="wi"><span class="wi-name">Oncology</span><span class="wbdg av">Average</span><div class="wbar-w"><div class="wbar-f" style="width:68%;background:var(--gold)"></div></div><span class="wpct">68%</span></div>
+          <div class="wi"><span class="wi-name">ICU</span><span class="wbdg gd">Good</span><div class="wbar-w"><div class="wbar-f" style="width:74%;background:var(--green)"></div></div><span class="wpct">74%</span></div>
+          <div class="wi"><span class="wi-name">Paediatrics</span><span class="wbdg gd">Good</span><div class="wbar-w"><div class="wbar-f" style="width:80%;background:var(--green)"></div></div><span class="wpct">80%</span></div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /g3 -->
+
+  <!-- ROW: Performance Chart + Leaderboard -->
+  <div class="g2" style="padding-bottom:0;padding-top:0">
+    <div class="card">
+      <div class="sh"><h3>Recent Mock Test Performance</h3><a href="#">View All</a></div>
+      <div class="bar-chart-wrap"><canvas id="barChart"></canvas></div>
+      <table class="ptbl" style="margin-top:14px;">
+        <thead><tr><th>Mock Test</th><th>Score</th><th>Correct</th><th>Time Taken</th><th>Performance</th></tr></thead>
+        <tbody>
+          <tr><td>Mock Test 12</td><td>68%</td><td>82 / 120</td><td>2h 12m</td><td><span class="pbdg good">Good</span></td></tr>
+          <tr><td>Mock Test 11</td><td>64%</td><td>77 / 120</td><td>2h 05m</td><td><span class="pbdg avg">Average</span></td></tr>
+          <tr><td>Mock Test 10</td><td>59%</td><td>71 / 120</td><td>2h 18m</td><td><span class="pbdg avg">Average</span></td></tr>
+          <tr><td>Mock Test 09</td><td>72%</td><td>86 / 120</td><td>2h 10m</td><td><span class="pbdg good">Good</span></td></tr>
+          <tr><td>Mock Test 08</td><td>55%</td><td>66 / 120</td><td>2h 30m</td><td><span class="pbdg avg">Average</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="sh"><h3>Leaderboard</h3><select class="wsel"><option>This Week</option><option>This Month</option><option>All Time</option></select></div>
+      <div class="lb-list">
+        <div class="li"><span class="lrank" style="color:var(--gold)">🥇</span><div class="lav" style="background:#fef3c7;color:#d97706;">PA</div><span class="lname">Physio_Aspirant</span><span class="lxp">10,250 XP</span></div>
+        <div class="li"><span class="lrank" style="color:#94a3b8">🥈</span><div class="lav" style="background:#f1f5f9;color:#64748b;">RP</div><span class="lname">Rehab_Pro</span><span class="lxp">9,480 XP</span></div>
+        <div class="li"><span class="lrank" style="color:#c47b3a">🥉</span><div class="lav" style="background:#fef9ec;color:#c47b3a;">MB</div><span class="lname">Move_Better</span><span class="lxp">8,760 XP</span></div>
+        <div class="li"><span class="lrank">4</span><div class="lav" style="background:#ede9fe;color:#7c3aed;">AK</div><span class="lname">APC_King</span><span class="lxp">7,920 XP</span></div>
+        <div class="li"><span class="lrank">5</span><div class="lav" style="background:#e0f2fe;color:#0284c7;">PT</div><span class="lname">PTworld</span><span class="lxp">7,210 XP</span></div>
+        <div class="li"><span class="lrank">6</span><div class="lav" style="background:#dcfce7;color:#16a34a;">SP</div><span class="lname">StudyPro</span><span class="lxp">6,870 XP</span></div>
+        <div class="li"><span class="lrank">7</span><div class="lav" style="background:#fff7ed;color:#ea580c;">NR</div><span class="lname">NeuroRehab</span><span class="lxp">6,420 XP</span></div>
+        <div style="text-align:center;font-size:.68rem;color:var(--grey-text);padding:4px 0;">• • •</div>
+        <div class="li you"><span class="lrank" style="color:var(--teal);font-weight:800;">12</span><div class="lav" style="background:var(--teal);color:white;">SR</div><span class="lname" style="color:var(--teal);font-weight:700;">You</span><span class="lxp">5,230 XP</span></div>
+      </div>
+      <button class="btn-flb">View Full Leaderboard</button>
+    </div>
+  </div>
+
+  <!-- ROW: Quick Access (standalone full section) -->
+  <div class="fw" style="padding-top:0;">
+    <div class="card">
+      <div class="sh"><h3>Quick Access</h3></div>
+      <div class="qa-grid" style="grid-template-columns:repeat(8,1fr);">
+        <a class="qa-btn" href="#"><div class="qa-ic" style="background:var(--teal-light)"><svg viewBox="0 0 24 24" style="stroke:var(--teal)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><span>Daily Quiz</span></a>
+        <a class="qa-btn" href="#"><div class="qa-ic" style="background:var(--purple-light)"><svg viewBox="0 0 24 24" style="stroke:var(--purple)"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div><span>Mock Tests</span></a>
+        <a class="qa-btn" href="#"><div class="qa-ic" style="background:var(--gold-light)"><svg viewBox="0 0 24 24" style="stroke:var(--gold)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span>Notes</span></a>
+        <a class="qa-btn" href="#"><div class="qa-ic" style="background:var(--red-light)"><svg viewBox="0 0 24 24" style="stroke:var(--red)"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div><span>Flashcards</span></a>
+        <a class="qa-btn" href="#"><div class="qa-ic" style="background:var(--blue-light)"><svg viewBox="0 0 24 24" style="stroke:var(--blue)"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></div><span>Bookmarks</span></a>
+        <a class="qa-btn" href="#"><div class="qa-ic" style="background:var(--green-light)"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><span>Downloads</span></a>
+        <a class="qa-btn" href="#"><div class="qa-ic" style="background:#f0fdf4"><svg viewBox="0 0 24 24" style="stroke:#15803d"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg></div><span>Calculator</span></a>
+        <a class="qa-btn" href="#"><div class="qa-ic" style="background:var(--teal-light)"><svg viewBox="0 0 24 24" style="stroke:var(--teal)"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><span>Study Plan</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW: Progress Tracker -->
+  <div class="fw" style="padding-top:16px;">
+    <div class="card">
+      <div class="sh"><h3>Progress Tracker</h3><a href="#">View Detailed Report</a></div>
+      <div class="progress-grid">
+        <div class="prog-card"><h4>Musculoskeletal</h4><div class="pc-val" style="color:var(--green)">82%</div><div class="prog-bar-row"><div class="pbar" style="flex:1;margin:0"><div class="pbar-f" style="width:82%;background:var(--green)"></div></div><span>82%</span></div></div>
+        <div class="prog-card"><h4>Neurology</h4><div class="pc-val" style="color:var(--red)">52%</div><div class="prog-bar-row"><div class="pbar" style="flex:1;margin:0"><div class="pbar-f" style="width:52%;background:var(--red)"></div></div><span>52%</span></div></div>
+        <div class="prog-card"><h4>Cardiorespiratory</h4><div class="pc-val" style="color:var(--orange)">61%</div><div class="prog-bar-row"><div class="pbar" style="flex:1;margin:0"><div class="pbar-f" style="width:61%;background:var(--orange)"></div></div><span>61%</span></div></div>
+        <div class="prog-card"><h4>Professional Practice</h4><div class="pc-val" style="color:var(--teal)">75%</div><div class="prog-bar-row"><div class="pbar" style="flex:1;margin:0"><div class="pbar-f" style="width:75%;background:var(--teal)"></div></div><span>75%</span></div></div>
+        <div class="prog-card"><h4>Paediatrics</h4><div class="pc-val" style="color:var(--green)">80%</div><div class="prog-bar-row"><div class="pbar" style="flex:1;margin:0"><div class="pbar-f" style="width:80%;background:var(--green)"></div></div><span>80%</span></div></div>
+        <div class="prog-card"><h4>Oncology</h4><div class="pc-val" style="color:var(--gold)">68%</div><div class="prog-bar-row"><div class="pbar" style="flex:1;margin:0"><div class="pbar-f" style="width:68%;background:var(--gold)"></div></div><span>68%</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW: Study Streak Calendar -->
+  <div class="fw" style="padding-top:0;">
+    <div class="card">
+      <div class="sh"><h3>Study Streak Calendar 🔥</h3><span style="font-size:.76rem;font-weight:700;color:var(--teal)">7 Day Streak!</span></div>
+      <div class="streak-labels"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+      <div class="streak-grid">
+        <div class="sday done">1</div><div class="sday done">2</div><div class="sday done">3</div><div class="sday done">4</div><div class="sday done">5</div><div class="sday done">6</div><div class="sday done">7</div>
+        <div class="sday done">8</div><div class="sday done">9</div><div class="sday done">10</div><div class="sday partial">11</div><div class="sday done">12</div><div class="sday done">13</div><div class="sday done">14</div>
+        <div class="sday done">15</div><div class="sday done">16</div><div class="sday partial">17</div><div class="sday done">18</div><div class="sday done">19</div><div class="sday done">20</div><div class="sday done">21</div>
+        <div class="sday off">22</div><div class="sday off">23</div><div class="sday done">24</div><div class="sday done">25</div><div class="sday done">26</div><div class="sday done">27</div><div class="sday today">28</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;margin-top:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:6px;font-size:.7rem;color:var(--grey-text)"><div style="width:12px;height:12px;border-radius:3px;background:var(--teal)"></div>Studied</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:.7rem;color:var(--grey-text)"><div style="width:12px;height:12px;border-radius:3px;background:var(--teal-light)"></div>Partial</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:.7rem;color:var(--grey-text)"><div style="width:12px;height:12px;border-radius:3px;background:var(--grey-100)"></div>Missed</div>
+        <span style="margin-left:auto;font-size:.76rem;font-weight:600;color:var(--navy);">Total: <span style="color:var(--teal)">24 days</span> this month</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW: Flashcards -->
+  <div class="fw" style="padding-top:0">
+    <div class="card">
+      <div class="sh"><h3>Flashcards</h3><a href="#">View All Decks</a></div>
+      <div class="fc-grid">
+        <div class="fc-card"><div class="fc-icon" style="background:var(--teal-light)"><svg viewBox="0 0 24 24" style="stroke:var(--teal)"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><h4>Musculoskeletal</h4><div class="fc-count">120</div><p>cards &nbsp;·&nbsp; 45 due</p></div>
+        <div class="fc-card"><div class="fc-icon" style="background:var(--purple-light)"><svg viewBox="0 0 24 24" style="stroke:var(--purple)"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><h4>Neurology</h4><div class="fc-count">98</div><p>cards &nbsp;·&nbsp; 62 due</p></div>
+        <div class="fc-card"><div class="fc-icon" style="background:var(--gold-light)"><svg viewBox="0 0 24 24" style="stroke:var(--gold)"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><h4>Cardiorespiratory</h4><div class="fc-count">85</div><p>cards &nbsp;·&nbsp; 30 due</p></div>
+        <div class="fc-card"><div class="fc-icon" style="background:var(--blue-light)"><svg viewBox="0 0 24 24" style="stroke:var(--blue)"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><h4>Prof. Practice</h4><div class="fc-count">74</div><p>cards &nbsp;·&nbsp; 18 due</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW: Recent Notes + Messages -->
+  <div class="g2" style="padding-top:0">
+    <div class="card">
+      <div class="sh"><h3>Recent Notes</h3><a href="#">View All Notes</a></div>
+      <div class="notes-list">
+        <div class="note-item"><div class="note-ico" style="background:var(--teal-light)"><svg viewBox="0 0 24 24" style="stroke:var(--teal)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1"><div class="note-title">Musculoskeletal – Rotator Cuff</div><div class="note-meta">Updated 2 days ago &nbsp;·&nbsp; 5 pages</div></div><span class="note-tag" style="background:var(--teal-light);color:var(--teal)">Musculo</span></div>
+        <div class="note-item"><div class="note-ico" style="background:var(--purple-light)"><svg viewBox="0 0 24 24" style="stroke:var(--purple)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1"><div class="note-title">Neurology – Stroke Rehabilitation</div><div class="note-meta">Updated 3 days ago &nbsp;·&nbsp; 8 pages</div></div><span class="note-tag" style="background:var(--purple-light);color:var(--purple)">Neuro</span></div>
+        <div class="note-item"><div class="note-ico" style="background:var(--gold-light)"><svg viewBox="0 0 24 24" style="stroke:var(--gold)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1"><div class="note-title">Cardiorespiratory – COPD Management</div><div class="note-meta">Updated 5 days ago &nbsp;·&nbsp; 6 pages</div></div><span class="note-tag" style="background:var(--gold-light);color:var(--gold)">Cardio</span></div>
+        <div class="note-item"><div class="note-ico" style="background:var(--blue-light)"><svg viewBox="0 0 24 24" style="stroke:var(--blue)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1"><div class="note-title">Professional Practice – Ethics &amp; Consent</div><div class="note-meta">Updated 1 week ago &nbsp;·&nbsp; 4 pages</div></div><span class="note-tag" style="background:var(--blue-light);color:var(--blue)">Prof.</span></div>
+        <div class="note-item"><div class="note-ico" style="background:var(--green-light)"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="flex:1"><div class="note-title">Paediatrics – Developmental Milestones</div><div class="note-meta">Updated 1 week ago &nbsp;·&nbsp; 7 pages</div></div><span class="note-tag" style="background:var(--green-light);color:var(--green)">Paeds</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sh"><h3>Messages</h3><a href="#">View All</a></div>
+      <div class="msg-list">
+        <div class="msg-item unread"><div class="mav" style="background:var(--teal-light);color:var(--teal);">MT</div><div style="flex:1"><div class="mname">MyExamPrep Team</div><div class="mtxt">Your Mock Test 13 is scheduled for tomorrow at 10 AM. Don't forget!</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><span class="mtime">2h ago</span><div class="munread"></div></div></div>
+        <div class="msg-item unread"><div class="mav" style="background:var(--purple-light);color:var(--purple);">MS</div><div style="flex:1"><div class="mname">Mentor Support</div><div class="mtxt">Great progress on Musculoskeletal! Focus more on Neurology this week.</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><span class="mtime">5h ago</span><div class="munread"></div></div></div>
+        <div class="msg-item"><div class="mav" style="background:var(--gold-light);color:var(--gold);">PA</div><div style="flex:1"><div class="mname">Physio_Aspirant</div><div class="mtxt">Hey! How did you find Mock Test 12? I found Q45 quite tricky.</div></div><span class="mtime">Yesterday</span></div>
+        <div class="msg-item"><div class="mav" style="background:var(--blue-light);color:var(--blue);">CM</div><div style="flex:1"><div class="mname">Community Manager</div><div class="mtxt">Welcome to the APC Prep community! Join our weekly group study session.</div></div><span class="mtime">2 days ago</span></div>
+        <div class="msg-item"><div class="mav" style="background:var(--green-light);color:var(--green);">SY</div><div style="flex:1"><div class="mname">System</div><div class="mtxt">Your subscription is valid till 24 May 2025. Renew early for discounts.</div></div><span class="mtime">3 days ago</span></div>
+      </div>
+      <button class="btn-flb" style="margin-top:10px;">Open Messages</button>
+    </div>
+  </div>
+
+  <!-- PRO TIP -->
+  <div class="fw" style="padding-top:0;padding-bottom:0">
+    <div class="ptip">
+      <div class="ptip-l"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M12 2a7 7 0 00-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0012 2z"/></svg><strong>Pro Tip:</strong>&nbsp; Consistent study + Regular mocks = Success in APC! Keep the momentum going! 💪</div>
+      <a class="ptip-r" href="#">Need Help? Contact Support</a>
+    </div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /wrap -->
+
+<script>
+// Sidebar toggle
+let sbOpen = true;
+function toggleSB(){
+  const s = document.getElementById('sb');
+  if(window.innerWidth <= 900){ s.classList.toggle('mob-open'); }
+  else{ sbOpen=!sbOpen; s.classList.toggle('closed',!sbOpen); }
+}
+
+// Donut
+new Chart(document.getElementById('donut').getContext('2d'),{
+  type:'doughnut',
+  data:{labels:['Musculoskeletal','Neurology','Cardiorespiratory','Professional Practice','Others'],
+    datasets:[{data:[33,22,18,15,12],backgroundColor:['#0d7a6e','#7c3aed','#f5a623','#0284c7','#d1d5db'],borderWidth:3,borderColor:'#fff',hoverOffset:6}]},
+  options:{cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw}%`}}},responsive:true,maintainAspectRatio:true}
+});
+
+// Ring
+new Chart(document.getElementById('ring').getContext('2d'),{
+  type:'doughnut',
+  data:{datasets:[{data:[75,25],backgroundColor:['#0d7a6e','#e6f5f3'],borderWidth:0}]},
+  options:{cutout:'78%',plugins:{legend:{display:false},tooltip:{enabled:false}},responsive:false,maintainAspectRatio:false}
+});
+
+// Sparkline
+new Chart(document.getElementById('sparkline').getContext('2d'),{
+  type:'line',
+  data:{labels:['','','','','','',''],datasets:[{data:[52,55,58,60,62,64,67],borderColor:'#f5a623',borderWidth:2,pointRadius:0,fill:true,backgroundColor:'rgba(245,166,35,.12)',tension:.4}]},
+  options:{plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}},responsive:true,maintainAspectRatio:false}
+});
+
+// Bar Chart
+new Chart(document.getElementById('barChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Mock 8','Mock 9','Mock 10','Mock 11','Mock 12'],
+    datasets:[
+      {label:'Score %',data:[55,72,59,64,68],backgroundColor:['#ede9fe','#dcfce7','#fff7ed','#fef9ec','#e6f5f3'],borderRadius:6,borderSkipped:false},
+      {label:'Pass Line',data:[60,60,60,60,60],type:'line',borderColor:'#dc2626',borderWidth:1.5,borderDash:[4,4],pointRadius:0,fill:false}
+    ]
+  },
+  options:{
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.raw}%`}}},
+    scales:{
+      y:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#f1f4f8'}},
+      x:{ticks:{font:{size:10}},grid:{display:false}}
+    },
+    responsive:true,maintainAspectRatio:false
+  }
+});
+</script>
+</body>
+</html>
